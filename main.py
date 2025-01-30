@@ -42,22 +42,22 @@ def count_clicks(token, url):
 def is_shorten_link(url, short_url):
     if "vk.cc" in short_url:
         try:
-            clicks_count = count_clicks(token, url)
-            print(f'Количество посещений: {clicks_count}')
+            count_click = count_clicks(token, url)
+            return count_click
         except requests.exceptions.HTTPError:
             print('Не действительная ссылка!!!')
     else:
         try:
             short_link = shorten_link(token, url)
-            print(f"Короткая ссылка: {short_link}")
+            return short_link
         except requests.exceptions.HTTPError:
             print('Не действительная ссылка!!!')
             pass
 
 
 def main():
-    is_shorten_link(url, short_url)
-
+    end_data = is_shorten_link(url, short_url)
+    print(end_data)
 
 if __name__ == "__main__":
     main()
