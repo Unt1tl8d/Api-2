@@ -3,61 +3,60 @@ import os
 from dotenv import load_dotenv
 
 
-load_dotenv()
-url = 'https://api.vk.ru/method/'
-token = os.environ['TOKEN']
-short_url = input('Введите ссылку:')
+VK_API_URL = 'https://api.vk.ru/method/'
 
 
-def shorten_link(token, url):
-    check_url = requests.get(short_url)
-    check_url.raise_for_status()
-    parm = {
-        'url': short_url,
-        "access_token": token,
-        "v": '5.199 HTTP/1.1'
-    }
-    response = requests.get(f'{url}utils.getShortLink', params=parm)
-    output = response.json()['response']
-    return output['short_url']
+def short_link(token, url):
+    try:
+        parm = {
+            'url': url,
+            "access_token": token,
+            "v": '5.199 HTTP/1.1'
+        }
+        response = requests.get(f'{VK_API_URL}utils.getShortLink', params=parm)
+        output = response.json()['response']
+        return output['short_url']
+    except:
+        return KeyError
 
 
 def count_clicks(token, url):
-    check_url = requests.get(short_url)
-    check_url.raise_for_status()
-    parm = {
-        "access_token": token,
-        'key': short_url.replace('https://vk.cc/', ''),
-        "interval": 'forever',
-        "v": '5.199 HTTP/1.1'
-    }
-    response = requests.get(f'{url}utils.getLinkStats', params=parm)
-    response.json()
-    output = response.json()["response"]
-    stats = output['stats']
-    views = stats[-1]
-    return  views['views']
+    try:
+        parm = {
+            "access_token": token,
+            'key': url.replace('https://vk.cc/', ''),
+            "interval": 'forever',
+            "v": '5.199 HTTP/1.1'
+        }
+        response = requests.get(f'{VK_API_URL}utils.getLinkStats', params=parm)
+        output = response.json()["response"]
+        stats = output['stats']
+        if stats == []:
+            return 0
+        else:    
+            views = stats[-1]
+            return views['views']
+    except requests.exceptions.HTTPError:
+        print('Не действительная ссылка!!!')
+        pass
 
 
-def is_shorten_link(url, short_url):
-    if "vk.cc" in short_url:
-        try:
-            count_click = count_clicks(token, url)
-            return count_click
-        except requests.exceptions.HTTPError:
-            print('Не действительная ссылка!!!')
+def is_shorten_link(token, url):
+    if short_link(token, url) == KeyError:
+        return True
     else:
-        try:
-            short_link = shorten_link(token, url)
-            return short_link
-        except requests.exceptions.HTTPError:
-            print('Не действительная ссылка!!!')
-            pass
+        return False
 
 
 def main():
-    end_data = is_shorten_link(url, short_url)
-    print(end_data)
+    load_dotenv()
+    url = input('Введите ссылку:')
+    token = os.environ['VK_TOKEN']
+    if is_shorten_link(token, url) == True:
+        return print(count_clicks(token, url))
+    else:
+        return print(short_link(token, url))
+            
 
 if __name__ == "__main__":
     main()
