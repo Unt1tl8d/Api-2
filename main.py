@@ -14,8 +14,8 @@ def short_link(token, url):
             "v": '5.199 HTTP/1.1'
         }
         response = requests.get(f'{VK_API_URL}utils.getShortLink', params=parm)
-        output = response.json()['response']
-        return output['short_url']
+        urloutput = response.json()['response']
+        return urloutput['short_url']
     except:
         return KeyError
 
@@ -29,8 +29,8 @@ def count_clicks(token, url):
             "v": '5.199 HTTP/1.1'
         }
         response = requests.get(f'{VK_API_URL}utils.getLinkStats', params=parm)
-        output = response.json()["response"]
-        stats = output['stats']
+        urloutput = response.json()["response"]
+        stats = urloutput['stats']
         if stats == []:
             return 0
         else:    
